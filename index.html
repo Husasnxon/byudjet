@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Byudjet">
-<title>рџ’° Mening Byudjetim</title>
+<title>💰 Mening Byudjetim</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f7;color:#1d1d1f;min-height:100vh}
@@ -75,7 +75,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <div class="auth-wrap" id="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">рџ’°</div>
+    <div class="auth-logo">💰</div>
     <div class="auth-title">Mening Byudjetim</div>
     <div class="auth-sub">Shaxsiy moliya boshqaruvi</div>
     <div class="auth-tabs">
@@ -98,14 +98,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="app" id="app">
   <div class="topbar">
     <div>
-      <div class="topbar-title">рџ’° Byudjetim</div>
+      <div class="topbar-title">💰 Byudjetim</div>
       <div class="topbar-user" id="user-email"></div>
     </div>
     <button class="logout-btn" onclick="doLogout()">Chiqish</button>
   </div>
 
   <div class="install-banner" id="install-banner">
-    <span>рџ“± Ilovani telefoningizga o'rnating!</span>
+    <span>📱 Ilovani telefoningizga o'rnating!</span>
     <button class="install-btn" onclick="installApp()">O'rnatish</button>
   </div>
 
@@ -117,10 +117,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="setTab('income')">рџ“€ Daromad</button>
-    <button class="tab" onclick="setTab('expense')">рџ“‰ Xarajat</button>
-    <button class="tab" onclick="setTab('debt')">рџ’і Qarz</button>
-    <button class="tab" onclick="setTab('saving')">рџђ· Jamg'arma</button>
+    <button class="tab active" onclick="setTab('income')">📈 Daromad</button>
+    <button class="tab" onclick="setTab('expense')">📉 Xarajat</button>
+    <button class="tab" onclick="setTab('debt')">💳 Qarz</button>
+    <button class="tab" onclick="setTab('saving')">🐷 Jamg'arma</button>
   </div>
 
   <div class="input-card">
@@ -134,15 +134,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="status-box" class="status-box"></div>
     <img id="preview-img" class="preview-img" alt="Rasm" />
     <div class="action-row">
-      <button class="btn" id="mic-btn" onclick="toggleVoice()">рџЋ¤ Ovoz</button>
-      <button class="btn" onclick="document.getElementById('img-input').click()">рџ“· Rasm</button>
+      <button class="btn" id="mic-btn" onclick="toggleVoice()">🎤 Ovoz</button>
+      <button class="btn" onclick="document.getElementById('img-input').click()">📷 Rasm</button>
       <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImage(event)" />
     </div>
-    <button class="btn-primary" id="add-btn" onclick="addItem()">вћ• Qo'shish</button>
+    <button class="btn-primary" id="add-btn" onclick="addItem()">➕ Qo'shish</button>
   </div>
 
   <div class="section-lbl" id="list-lbl">Daromad ro'yxati</div>
-  <div class="list" id="item-list"><div class="loading">вЏі Yuklanmoqda...</div></div>
+  <div class="list" id="item-list"><div class="loading">⏳ Yuklanmoqda...</div></div>
 </div>
 
 <script type="module">
@@ -213,7 +213,7 @@ window.doAuth = async () => {
   const pass = document.getElementById('auth-pass').value;
   if (!email||!pass) { showAuthError('Email va parolni kiriting!'); return; }
   const btn = document.getElementById('auth-btn');
-  btn.disabled=true; btn.textContent='вЏі...';
+  btn.disabled=true; btn.textContent='⏳...';
   try {
     if (authMode==='login') await signInWithEmailAndPassword(auth,email,pass);
     else await createUserWithEmailAndPassword(auth,email,pass);
@@ -227,7 +227,7 @@ window.doAuth = async () => {
 window.forgotPass = async () => {
   const email = document.getElementById('auth-email').value.trim();
   if (!email) { showAuthError('Emailni kiriting!'); return; }
-  try { await sendPasswordResetEmail(auth,email); showAuthError('вњ… Parol tiklash xati yuborildi!',true); }
+  try { await sendPasswordResetEmail(auth,email); showAuthError('✅ Parol tiklash xati yuborildi!',true); }
   catch(e) { showAuthError('Xato: '+e.message); }
 };
 
@@ -254,14 +254,14 @@ window.setTab = t => {
 
 async function loadData() {
   if (!currentUser) return;
-  document.getElementById('item-list').innerHTML='<div class="loading">вЏі Yuklanmoqda...</div>';
+  document.getElementById('item-list').innerHTML='<div class="loading">⏳ Yuklanmoqda...</div>';
   try {
     const q=query(collection(db,'transactions'),where('uid','==',currentUser.uid),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
     allData=snap.docs.map(d=>({id:d.id,...d.data()}));
     updateSummary(); renderList();
   } catch(e) {
-    document.getElementById('item-list').innerHTML='<div class="empty">вќЊ '+e.message+'</div>';
+    document.getElementById('item-list').innerHTML='<div class="empty">❌ '+e.message+'</div>';
   }
 }
 
@@ -280,11 +280,11 @@ function renderList() {
     <div class="item">
       <div class="item-left">
         <div class="item-name">${x.name||''}</div>
-        <div class="item-meta">${x.cat||''} В· ${x.date||''}</div>
+        <div class="item-meta">${x.cat||''} · ${x.date||''}</div>
       </div>
       <div class="item-right">
         <span class="item-amount" style="color:${COLORS[tab]}">${fmt(x.amount)}</span>
-        <button class="del-btn" onclick="delItem('${x.id}')">рџ—‘</button>
+        <button class="del-btn" onclick="delItem('${x.id}')">🗑</button>
       </div>
     </div>`).join('');
 }
@@ -295,7 +295,7 @@ window.addItem = async () => {
   const cat=document.getElementById('inp-cat').value||'Boshqa';
   if (!name||!amount||amount<=0){setStatus('Nom va summani kiriting.','error');return;}
   const btn=document.getElementById('add-btn');
-  btn.disabled=true; btn.textContent='вЏі Saqlanmoqda...';
+  btn.disabled=true; btn.textContent='⏳ Saqlanmoqda...';
   setStatus('Saqlanmoqda...','info');
   try {
     const ref=await addDoc(collection(db,'transactions'),{
@@ -306,11 +306,11 @@ window.addItem = async () => {
     document.getElementById('inp-name').value='';
     document.getElementById('inp-amount').value='';
     document.getElementById('preview-img').style.display='none';
-    setStatus('вњ… Saqlandi!','success');
+    setStatus('✅ Saqlandi!','success');
     updateSummary(); renderList();
     setTimeout(()=>setStatus(''),2000);
-  } catch(e){setStatus('вќЊ '+e.message,'error');}
-  btn.disabled=false; btn.textContent="вћ• Qo'shish";
+  } catch(e){setStatus('❌ '+e.message,'error');}
+  btn.disabled=false; btn.textContent="➕ Qo'shish";
 };
 
 window.delItem = async id => {
@@ -324,14 +324,14 @@ window.toggleVoice = () => {
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if (!SR){setStatus("Ovoz kiritish qo'llab-quvvatlanmaydi.",'error');return;}
   recognition=new SR(); recognition.lang='uz-UZ'; recognition.interimResults=false;
-  recognition.onstart=()=>{isRecording=true;const b=document.getElementById('mic-btn');b.className='btn recording';b.textContent="вЏ№ To'xtatish";setStatus("Gapiring...",'info');};
-  recognition.onresult=e=>{const t=e.results[0][0].transcript;setStatus('"'+t+'" вЂ” tahlil...','info');analyzeVoice(t);};
+  recognition.onstart=()=>{isRecording=true;const b=document.getElementById('mic-btn');b.className='btn recording';b.textContent="⏹ To'xtatish";setStatus("Gapiring...",'info');};
+  recognition.onresult=e=>{const t=e.results[0][0].transcript;setStatus('"'+t+'" — tahlil...','info');analyzeVoice(t);};
   recognition.onerror=e=>{setStatus('Xato: '+e.error,'error');stopVoice();};
   recognition.onend=stopVoice;
   recognition.start();
 };
 
-function stopVoice(){isRecording=false;if(recognition)recognition.stop();const b=document.getElementById('mic-btn');b.className='btn';b.textContent='рџЋ¤ Ovoz';}
+function stopVoice(){isRecording=false;if(recognition)recognition.stop();const b=document.getElementById('mic-btn');b.className='btn';b.textContent='🎤 Ovoz';}
 
 async function analyzeVoice(text){
   try{
