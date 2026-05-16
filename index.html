@@ -1,8 +1,369 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /transactions/{doc} {
-      allow read, write: if request.auth != null;
-    }
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#007aff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Byudjet">
+<title>рџ’° Mening Byudjetim</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f7;color:#1d1d1f;min-height:100vh}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:linear-gradient(135deg,#007aff 0%,#5856d6 100%)}
+.auth-card{background:#fff;border-radius:24px;padding:2rem;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.auth-logo{font-size:48px;text-align:center;margin-bottom:8px}
+.auth-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+.auth-sub{font-size:14px;color:#888;text-align:center;margin-bottom:24px}
+.auth-tabs{display:flex;background:#f5f5f7;border-radius:12px;padding:3px;margin-bottom:20px}
+.auth-tab{flex:1;padding:8px;border-radius:10px;border:none;background:transparent;font-size:14px;cursor:pointer;color:#888;font-weight:500}
+.auth-tab.active{background:#fff;color:#1d1d1f;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.inp{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #e5e5ea;font-size:15px;margin-bottom:12px;outline:none;background:#f9f9fb}
+.inp:focus{border-color:#007aff;background:#fff}
+.auth-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#007aff;color:#fff;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-error{background:#fff0f0;color:#ff3b30;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:none}
+.auth-error.show{display:block}
+.app{display:none;max-width:480px;margin:0 auto;padding:1rem 1rem 2rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-top:0.5rem}
+.topbar-title{font-size:20px;font-weight:700}
+.topbar-user{font-size:12px;color:#888;margin-top:1px}
+.logout-btn{padding:6px 12px;border-radius:10px;border:1px solid #e5e5ea;background:#fff;font-size:12px;cursor:pointer;color:#ff3b30;font-weight:500}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.stat{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.stat-label{font-size:11px;color:#888;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
+.stat-val{font-size:20px;font-weight:700}
+.tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:20px;border:1.5px solid #e5e5ea;font-size:13px;cursor:pointer;background:#fff;color:#555;font-weight:600;white-space:nowrap;flex-shrink:0}
+.tab.active{background:#007aff;color:#fff;border-color:#007aff}
+.input-card{background:#fff;border-radius:18px;padding:1rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+.input-row{display:flex;gap:8px;margin-bottom:10px}
+.input-row input,.input-row select{flex:1;min-width:0;font-size:14px;padding:10px 12px;border-radius:12px;border:1.5px solid #e5e5ea;background:#f9f9fb;outline:none}
+.input-row input:focus,.input-row select:focus{border-color:#007aff;background:#fff}
+.input-row input[type=number]{max-width:120px}
+.action-row{display:flex;gap:8px;margin-bottom:10px}
+.btn{flex:1;padding:10px;border-radius:12px;border:1.5px solid #e5e5ea;background:#f9f9fb;font-size:13px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:600}
+.btn.recording{background:#fff0f0;color:#ff3b30;border-color:#ff3b30}
+.btn-primary{background:#007aff;color:#fff;border:none;width:100%;padding:13px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.status-box{border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:13px;display:none;line-height:1.5}
+.status-box.info{display:block;background:#f0f7ff;color:#007aff}
+.status-box.error{display:block;background:#fff0f0;color:#ff3b30}
+.status-box.success{display:block;background:#f0fff4;color:#34c759}
+.preview-img{width:100%;max-height:130px;object-fit:contain;border-radius:12px;margin-bottom:10px;display:none;border:1.5px solid #e5e5ea}
+.section-lbl{font-size:15px;font-weight:700;color:#333;margin-bottom:10px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.item-left{flex:1}
+.item-name{font-size:14px;font-weight:600;color:#1d1d1f}
+.item-meta{font-size:12px;color:#888;margin-top:2px}
+.item-right{display:flex;align-items:center;gap:8px}
+.item-amount{font-size:15px;font-weight:700}
+.del-btn{background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:4px}
+.del-btn:hover{color:#ff3b30}
+.empty{text-align:center;color:#bbb;font-size:14px;padding:2.5rem 0}
+.loading{text-align:center;color:#bbb;font-size:14px;padding:1.5rem 0}
+.install-banner{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);display:none;align-items:center;gap:10px}
+.install-banner.show{display:flex}
+.install-banner span{flex:1;font-size:13px;color:#555}
+.install-btn{padding:7px 14px;border-radius:10px;background:#007aff;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap" id="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">рџ’°</div>
+    <div class="auth-title">Mening Byudjetim</div>
+    <div class="auth-sub">Shaxsiy moliya boshqaruvi</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Kirish</button>
+      <button class="auth-tab" onclick="switchTab('register')">Ro'yxatdan o'tish</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <input class="inp" type="email" id="auth-email" placeholder="Email" />
+    <input class="inp" type="password" id="auth-pass" placeholder="Parol (kamida 6 ta belgi)" />
+    <div id="auth-name-wrap" style="display:none">
+      <input class="inp" type="text" id="auth-name" placeholder="Ismingiz" />
+    </div>
+    <button class="auth-btn" id="auth-btn" onclick="doAuth()">Kirish</button>
+    <div style="text-align:center">
+      <button onclick="forgotPass()" style="background:none;border:none;color:#007aff;font-size:13px;cursor:pointer">Parolni unutdim?</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">рџ’° Byudjetim</div>
+      <div class="topbar-user" id="user-email"></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Chiqish</button>
+  </div>
+
+  <div class="install-banner" id="install-banner">
+    <span>рџ“± Ilovani telefoningizga o'rnating!</span>
+    <button class="install-btn" onclick="installApp()">O'rnatish</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="stat"><div class="stat-label">Daromad</div><div class="stat-val" id="s-income" style="color:#34c759">0 so'm</div></div>
+    <div class="stat"><div class="stat-label">Xarajat</div><div class="stat-val" id="s-expense" style="color:#ff3b30">0 so'm</div></div>
+    <div class="stat"><div class="stat-label">Qarz</div><div class="stat-val" id="s-debt" style="color:#ff9500">0 so'm</div></div>
+    <div class="stat"><div class="stat-label">Jamg'arma</div><div class="stat-val" id="s-saving" style="color:#007aff">0 so'm</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('income')">рџ“€ Daromad</button>
+    <button class="tab" onclick="setTab('expense')">рџ“‰ Xarajat</button>
+    <button class="tab" onclick="setTab('debt')">рџ’і Qarz</button>
+    <button class="tab" onclick="setTab('saving')">рџђ· Jamg'arma</button>
+  </div>
+
+  <div class="input-card">
+    <div class="input-row">
+      <input type="text" id="inp-name" placeholder="Nomi" />
+      <input type="number" id="inp-amount" placeholder="Summa" min="0" />
+    </div>
+    <div class="input-row">
+      <select id="inp-cat"><option value="">Kategoriya</option></select>
+    </div>
+    <div id="status-box" class="status-box"></div>
+    <img id="preview-img" class="preview-img" alt="Rasm" />
+    <div class="action-row">
+      <button class="btn" id="mic-btn" onclick="toggleVoice()">рџЋ¤ Ovoz</button>
+      <button class="btn" onclick="document.getElementById('img-input').click()">рџ“· Rasm</button>
+      <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImage(event)" />
+    </div>
+    <button class="btn-primary" id="add-btn" onclick="addItem()">вћ• Qo'shish</button>
+  </div>
+
+  <div class="section-lbl" id="list-lbl">Daromad ro'yxati</div>
+  <div class="list" id="item-list"><div class="loading">вЏі Yuklanmoqda...</div></div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCOlfNYNfBTbpWFhe8ZFIsaCyi4ZVSy110",
+  authDomain: "byudjet-app.firebaseapp.com",
+  projectId: "byudjet-app",
+  storageBucket: "byudjet-app.firebasestorage.app",
+  messagingSenderId: "622811274230",
+  appId: "1:622811274230:web:499e6c97a076f6bf8b05d7"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+const CATS = {
+  income: ['Ish haqi','Biznes','Freelance','Investitsiya','Boshqa'],
+  expense: ['Oziq-ovqat','Transport','Uy-joy','Kiyim',"Sog'liq","O'yin-kulgi",'Kommunal','Boshqa'],
+  debt: ['Bank krediti',"Do'stdan",'Oila','Boshqa'],
+  saving: ["Favqulodda fond","Ta'til",'Uy','Mashina','Boshqa']
+};
+const COLORS = {income:'#34c759',expense:'#ff3b30',debt:'#ff9500',saving:'#007aff'};
+const LABELS = {income:'Daromad',expense:'Xarajat',debt:'Qarz',saving:"Jamg'arma"};
+
+let currentUser=null, allData=[], tab='income', recognition=null, isRecording=false, deferredPrompt=null, authMode='login';
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+window.installApp = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt(); await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.remove('show');
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('auth-wrap').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('user-email').textContent = user.email;
+    setTab('income'); loadData();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-wrap').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    allData = [];
+  }
+});
+
+window.switchTab = mode => {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('active', ['login','register'][i]===mode));
+  document.getElementById('auth-name-wrap').style.display = mode==='register' ? 'block' : 'none';
+  document.getElementById('auth-btn').textContent = mode==='login' ? 'Kirish' : "Ro'yxatdan o'tish";
+  showAuthError('');
+};
+
+window.doAuth = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  if (!email||!pass) { showAuthError('Email va parolni kiriting!'); return; }
+  const btn = document.getElementById('auth-btn');
+  btn.disabled=true; btn.textContent='вЏі...';
+  try {
+    if (authMode==='login') await signInWithEmailAndPassword(auth,email,pass);
+    else await createUserWithEmailAndPassword(auth,email,pass);
+  } catch(e) {
+    const msgs = {'auth/user-not-found':'Foydalanuvchi topilmadi','auth/wrong-password':"Parol noto'g'ri",'auth/email-already-in-use':"Bu email allaqachon ro'yxatdan o'tgan",'auth/weak-password':'Parol kamida 6 ta belgi','auth/invalid-email':"Email noto'g'ri",'auth/invalid-credential':"Email yoki parol noto'g'ri"};
+    showAuthError(msgs[e.code]||e.message);
+  }
+  btn.disabled=false; btn.textContent=authMode==='login'?'Kirish':"Ro'yxatdan o'tish";
+};
+
+window.forgotPass = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showAuthError('Emailni kiriting!'); return; }
+  try { await sendPasswordResetEmail(auth,email); showAuthError('вњ… Parol tiklash xati yuborildi!',true); }
+  catch(e) { showAuthError('Xato: '+e.message); }
+};
+
+window.doLogout = () => signOut(auth);
+
+function showAuthError(msg,ok=false) {
+  const el=document.getElementById('auth-error');
+  el.textContent=msg; el.className='auth-error'+(msg?' show':'');
+  el.style.cssText=ok?'background:#f0fff4;color:#34c759;display:block':'';
+}
+
+function fmt(n) { return Math.round(Number(n)||0).toLocaleString('uz-UZ')+" so'm"; }
+function setStatus(msg,type='') { const b=document.getElementById('status-box'); b.textContent=msg; b.className='status-box'+(type?' '+type:''); }
+
+window.setTab = t => {
+  tab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['income','expense','debt','saving'][i]===t));
+  const sel=document.getElementById('inp-cat');
+  sel.innerHTML='<option value="">Kategoriya</option>';
+  CATS[t].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+  document.getElementById('list-lbl').textContent=LABELS[t]+" ro'yxati";
+  renderList();
+};
+
+async function loadData() {
+  if (!currentUser) return;
+  document.getElementById('item-list').innerHTML='<div class="loading">вЏі Yuklanmoqda...</div>';
+  try {
+    const q=query(collection(db,'transactions'),where('uid','==',currentUser.uid),orderBy('createdAt','desc'));
+    const snap=await getDocs(q);
+    allData=snap.docs.map(d=>({id:d.id,...d.data()}));
+    updateSummary(); renderList();
+  } catch(e) {
+    document.getElementById('item-list').innerHTML='<div class="empty">вќЊ '+e.message+'</div>';
   }
 }
+
+function updateSummary() {
+  ['income','expense','debt','saving'].forEach(k=>{
+    const total=allData.filter(x=>x.type===k).reduce((s,x)=>s+(Number(x.amount)||0),0);
+    document.getElementById('s-'+k).textContent=fmt(total);
+  });
+}
+
+function renderList() {
+  const items=allData.filter(x=>x.type===tab);
+  const list=document.getElementById('item-list');
+  if (!items.length){list.innerHTML='<div class="empty">Hozircha yozuv yo\'q</div>';return;}
+  list.innerHTML=items.map(x=>`
+    <div class="item">
+      <div class="item-left">
+        <div class="item-name">${x.name||''}</div>
+        <div class="item-meta">${x.cat||''} В· ${x.date||''}</div>
+      </div>
+      <div class="item-right">
+        <span class="item-amount" style="color:${COLORS[tab]}">${fmt(x.amount)}</span>
+        <button class="del-btn" onclick="delItem('${x.id}')">рџ—‘</button>
+      </div>
+    </div>`).join('');
+}
+
+window.addItem = async () => {
+  const name=document.getElementById('inp-name').value.trim();
+  const amount=parseFloat(document.getElementById('inp-amount').value);
+  const cat=document.getElementById('inp-cat').value||'Boshqa';
+  if (!name||!amount||amount<=0){setStatus('Nom va summani kiriting.','error');return;}
+  const btn=document.getElementById('add-btn');
+  btn.disabled=true; btn.textContent='вЏі Saqlanmoqda...';
+  setStatus('Saqlanmoqda...','info');
+  try {
+    const ref=await addDoc(collection(db,'transactions'),{
+      uid:currentUser.uid,type:tab,name,cat,amount,
+      date:new Date().toLocaleDateString('uz-UZ'),createdAt:Date.now()
+    });
+    allData.unshift({id:ref.id,uid:currentUser.uid,type:tab,name,cat,amount,date:new Date().toLocaleDateString('uz-UZ')});
+    document.getElementById('inp-name').value='';
+    document.getElementById('inp-amount').value='';
+    document.getElementById('preview-img').style.display='none';
+    setStatus('вњ… Saqlandi!','success');
+    updateSummary(); renderList();
+    setTimeout(()=>setStatus(''),2000);
+  } catch(e){setStatus('вќЊ '+e.message,'error');}
+  btn.disabled=false; btn.textContent="вћ• Qo'shish";
+};
+
+window.delItem = async id => {
+  if (!confirm("O'chirilsinmi?")) return;
+  try { await deleteDoc(doc(db,'transactions',id)); allData=allData.filter(x=>x.id!==id); updateSummary(); renderList(); }
+  catch(e){alert('Xato: '+e.message);}
+};
+
+window.toggleVoice = () => {
+  if (isRecording){stopVoice();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if (!SR){setStatus("Ovoz kiritish qo'llab-quvvatlanmaydi.",'error');return;}
+  recognition=new SR(); recognition.lang='uz-UZ'; recognition.interimResults=false;
+  recognition.onstart=()=>{isRecording=true;const b=document.getElementById('mic-btn');b.className='btn recording';b.textContent="вЏ№ To'xtatish";setStatus("Gapiring...",'info');};
+  recognition.onresult=e=>{const t=e.results[0][0].transcript;setStatus('"'+t+'" вЂ” tahlil...','info');analyzeVoice(t);};
+  recognition.onerror=e=>{setStatus('Xato: '+e.error,'error');stopVoice();};
+  recognition.onend=stopVoice;
+  recognition.start();
+};
+
+function stopVoice(){isRecording=false;if(recognition)recognition.stop();const b=document.getElementById('mic-btn');b.className='btn';b.textContent='рџЋ¤ Ovoz';}
+
+async function analyzeVoice(text){
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:`"${tab}" uchun: "${text}". JSON: {"name":"...","amount":12345,"cat":"..."}. Kategoriyalar: ${CATS[tab].join(', ')}`}]})});
+    const d=await res.json();
+    const p=JSON.parse(d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    if(p.name)document.getElementById('inp-name').value=p.name;
+    if(p.amount>0)document.getElementById('inp-amount').value=p.amount;
+    if(p.cat){const s=document.getElementById('inp-cat');for(let o of s.options)if(o.value===p.cat){s.value=p.cat;break;}}
+    setStatus("Tayyor! 'Qo'shish' ni bosing.",'success');
+  }catch(e){setStatus("Tahlil xatosi.",'error');}
+}
+
+window.handleImage = e => {
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    const base64=ev.target.result.split(',')[1];
+    const img=document.getElementById('preview-img');img.src=ev.target.result;img.style.display='block';
+    setStatus('Rasm tahlil qilinmoqda...','info');
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:base64}},{type:'text',text:`"${tab}" uchun: nomi, summasi, kategoriya. JSON: {"name":"...","amount":12345,"cat":"..."}. Kategoriyalar: ${CATS[tab].join(', ')}`}]}]})});
+      const d=await res.json();
+      const p=JSON.parse(d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+      if(p.name)document.getElementById('inp-name').value=p.name;
+      if(p.amount>0)document.getElementById('inp-amount').value=p.amount;
+      if(p.cat){const s=document.getElementById('inp-cat');for(let o of s.options)if(o.value===p.cat){s.value=p.cat;break;}}
+      setStatus("Rasm o'qildi! 'Qo'shish' ni bosing.",'success');
+    }catch(e){setStatus("Rasmni o'qishda xato.",'error');}
+  };
+  reader.readAsDataURL(file);e.target.value='';
+};
+</script>
+</body>
+</html>
