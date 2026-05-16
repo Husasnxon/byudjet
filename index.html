@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Byudjet">
-<title>💰 Mening Byudjetim</title>
+<title>Mening Byudjetim</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f7;color:#1d1d1f;min-height:100vh}
@@ -23,21 +23,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .inp:focus{border-color:#007aff;background:#fff}
 .auth-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#007aff;color:#fff;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:12px}
 .auth-btn:disabled{opacity:0.5;cursor:not-allowed}
-.auth-error{background:#fff0f0;color:#ff3b30;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:none}
-.auth-error.show{display:block}
+.auth-error{border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;display:none}
+.auth-error.show{display:block;background:#fff0f0;color:#ff3b30}
+.auth-error.ok{display:block;background:#f0fff4;color:#34c759}
+
 .app{display:none;max-width:480px;margin:0 auto;padding:1rem 1rem 2rem}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-top:0.5rem}
 .topbar-title{font-size:20px;font-weight:700}
 .topbar-user{font-size:12px;color:#888;margin-top:1px}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.report-btn{padding:6px 12px;border-radius:10px;border:1px solid #007aff;background:transparent;font-size:12px;cursor:pointer;color:#007aff;font-weight:600}
 .logout-btn{padding:6px 12px;border-radius:10px;border:1px solid #e5e5ea;background:#fff;font-size:12px;cursor:pointer;color:#ff3b30;font-weight:500}
+
 .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
 .stat{background:#fff;border-radius:16px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
 .stat-label{font-size:11px;color:#888;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
 .stat-val{font-size:20px;font-weight:700}
+
 .tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px}
 .tabs::-webkit-scrollbar{display:none}
 .tab{padding:7px 14px;border-radius:20px;border:1.5px solid #e5e5ea;font-size:13px;cursor:pointer;background:#fff;color:#555;font-weight:600;white-space:nowrap;flex-shrink:0}
 .tab.active{background:#007aff;color:#fff;border-color:#007aff}
+
 .input-card{background:#fff;border-radius:18px;padding:1rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
 .input-row{display:flex;gap:8px;margin-bottom:10px}
 .input-row input,.input-row select{flex:1;min-width:0;font-size:14px;padding:10px 12px;border-radius:12px;border:1.5px solid #e5e5ea;background:#f9f9fb;outline:none}
@@ -65,17 +72,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .del-btn:hover{color:#ff3b30}
 .empty{text-align:center;color:#bbb;font-size:14px;padding:2.5rem 0}
 .loading{text-align:center;color:#bbb;font-size:14px;padding:1.5rem 0}
-.install-banner{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);display:none;align-items:center;gap:10px}
-.install-banner.show{display:flex}
-.install-banner span{flex:1;font-size:13px;color:#555}
-.install-btn{padding:7px 14px;border-radius:10px;background:#007aff;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer}
+
+/* REPORT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.modal-title{font-size:18px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;padding:4px}
+.report-tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.rtab{padding:6px 14px;border-radius:20px;border:1.5px solid #e5e5ea;font-size:13px;cursor:pointer;background:#f9f9fb;color:#555;font-weight:600}
+.rtab.active{background:#007aff;color:#fff;border-color:#007aff}
+.chart-wrap{position:relative;width:200px;height:200px;margin:0 auto 1.5rem}
+canvas#donut{width:200px!important;height:200px!important}
+.legend{display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-right:8px}
+.legend-label{flex:1;color:#555}
+.legend-val{font-weight:600;color:#1d1d1f}
+.balance-card{background:linear-gradient(135deg,#007aff,#5856d6);border-radius:16px;padding:16px;margin-bottom:1rem;color:#fff;text-align:center}
+.balance-label{font-size:12px;opacity:0.8;margin-bottom:4px}
+.balance-val{font-size:28px;font-weight:700}
 </style>
 </head>
 <body>
 
+<!-- AUTH -->
 <div class="auth-wrap" id="auth-wrap">
   <div class="auth-card">
-    <div class="auth-logo">💰</div>
+    <div class="auth-logo">&#x1F4B0;</div>
     <div class="auth-title">Mening Byudjetim</div>
     <div class="auth-sub">Shaxsiy moliya boshqaruvi</div>
     <div class="auth-tabs">
@@ -95,18 +120,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- APP -->
 <div class="app" id="app">
   <div class="topbar">
     <div>
-      <div class="topbar-title">💰 Byudjetim</div>
+      <div class="topbar-title">&#x1F4B0; Byudjetim</div>
       <div class="topbar-user" id="user-email"></div>
     </div>
-    <button class="logout-btn" onclick="doLogout()">Chiqish</button>
-  </div>
-
-  <div class="install-banner" id="install-banner">
-    <span>📱 Ilovani telefoningizga o'rnating!</span>
-    <button class="install-btn" onclick="installApp()">O'rnatish</button>
+    <div class="topbar-right">
+      <button class="report-btn" onclick="openReport()">&#x1F4CA; Hisobot</button>
+      <button class="logout-btn" onclick="doLogout()">Chiqish</button>
+    </div>
   </div>
 
   <div class="summary-grid">
@@ -117,10 +141,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="setTab('income')">📈 Daromad</button>
-    <button class="tab" onclick="setTab('expense')">📉 Xarajat</button>
-    <button class="tab" onclick="setTab('debt')">💳 Qarz</button>
-    <button class="tab" onclick="setTab('saving')">🐷 Jamg'arma</button>
+    <button class="tab active" onclick="setTab('income')">&#x1F4C8; Daromad</button>
+    <button class="tab" onclick="setTab('expense')">&#x1F4C9; Xarajat</button>
+    <button class="tab" onclick="setTab('debt')">&#x1F4B3; Qarz</button>
+    <button class="tab" onclick="setTab('saving')">&#x1F3AF; Jamg'arma</button>
   </div>
 
   <div class="input-card">
@@ -134,15 +158,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="status-box" class="status-box"></div>
     <img id="preview-img" class="preview-img" alt="Rasm" />
     <div class="action-row">
-      <button class="btn" id="mic-btn" onclick="toggleVoice()">🎤 Ovoz</button>
-      <button class="btn" onclick="document.getElementById('img-input').click()">📷 Rasm</button>
+      <button class="btn" id="mic-btn" onclick="toggleVoice()">&#x1F3A4; Ovoz</button>
+      <button class="btn" onclick="document.getElementById('img-input').click()">&#x1F4F7; Rasm</button>
       <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImage(event)" />
     </div>
-    <button class="btn-primary" id="add-btn" onclick="addItem()">➕ Qo'shish</button>
+    <button class="btn-primary" id="add-btn" onclick="addItem()">+ Qo'shish</button>
   </div>
 
   <div class="section-lbl" id="list-lbl">Daromad ro'yxati</div>
-  <div class="list" id="item-list"><div class="loading">⏳ Yuklanmoqda...</div></div>
+  <div class="list" id="item-list"><div class="loading">Yuklanmoqda...</div></div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="report-modal" onclick="closeReportOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">&#x1F4CA; Hisobot</span>
+      <button class="modal-close" onclick="closeReport()">&#x2715;</button>
+    </div>
+    <div class="balance-card">
+      <div class="balance-label">Umumiy balans</div>
+      <div class="balance-val" id="r-balance">0 so'm</div>
+    </div>
+    <div class="report-tabs">
+      <button class="rtab active" onclick="showChart('expense')">Xarajatlar</button>
+      <button class="rtab" onclick="showChart('income')">Daromadlar</button>
+      <button class="rtab" onclick="showChart('debt')">Qarzlar</button>
+      <button class="rtab" onclick="showChart('saving')">Jamg'arma</button>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="donut"></canvas>
+    </div>
+    <div class="legend" id="chart-legend"></div>
+  </div>
 </div>
 
 <script type="module">
@@ -171,76 +219,67 @@ const CATS = {
 };
 const COLORS = {income:'#34c759',expense:'#ff3b30',debt:'#ff9500',saving:'#007aff'};
 const LABELS = {income:'Daromad',expense:'Xarajat',debt:'Qarz',saving:"Jamg'arma"};
+const PIE_COLORS = ['#007aff','#34c759','#ff3b30','#ff9500','#5856d6','#ff2d55','#00c7be','#af52de'];
 
-let currentUser=null, allData=[], tab='income', recognition=null, isRecording=false, deferredPrompt=null, authMode='login';
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); deferredPrompt = e;
-  document.getElementById('install-banner').classList.add('show');
-});
-window.installApp = async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt(); await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('install-banner').classList.remove('show');
-};
+let currentUser=null, allData=[], tab='income', recognition=null, isRecording=false, authMode='login';
+let donutChart=null, currentChartType='expense';
 
 onAuthStateChanged(auth, user => {
-  if (user) {
-    currentUser = user;
-    document.getElementById('auth-wrap').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('user-email').textContent = user.email;
+  if(user){
+    currentUser=user;
+    document.getElementById('auth-wrap').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('user-email').textContent=user.email;
     setTab('income'); loadData();
   } else {
-    currentUser = null;
-    document.getElementById('auth-wrap').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-    allData = [];
+    currentUser=null;
+    document.getElementById('auth-wrap').style.display='flex';
+    document.getElementById('app').style.display='none';
+    allData=[];
   }
 });
 
 window.switchTab = mode => {
-  authMode = mode;
-  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('active', ['login','register'][i]===mode));
-  document.getElementById('auth-name-wrap').style.display = mode==='register' ? 'block' : 'none';
-  document.getElementById('auth-btn').textContent = mode==='login' ? 'Kirish' : "Ro'yxatdan o'tish";
-  showAuthError('');
+  authMode=mode;
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',['login','register'][i]===mode));
+  document.getElementById('auth-name-wrap').style.display=mode==='register'?'block':'none';
+  document.getElementById('auth-btn').textContent=mode==='login'?'Kirish':"Ro'yxatdan o'tish";
+  showAuthErr('');
 };
 
 window.doAuth = async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass = document.getElementById('auth-pass').value;
-  if (!email||!pass) { showAuthError('Email va parolni kiriting!'); return; }
-  const btn = document.getElementById('auth-btn');
-  btn.disabled=true; btn.textContent='⏳...';
-  try {
-    if (authMode==='login') await signInWithEmailAndPassword(auth,email,pass);
+  const email=document.getElementById('auth-email').value.trim();
+  const pass=document.getElementById('auth-pass').value;
+  if(!email||!pass){showAuthErr('Email va parolni kiriting!');return;}
+  const btn=document.getElementById('auth-btn');
+  btn.disabled=true; btn.textContent='...';
+  try{
+    if(authMode==='login') await signInWithEmailAndPassword(auth,email,pass);
     else await createUserWithEmailAndPassword(auth,email,pass);
-  } catch(e) {
-    const msgs = {'auth/user-not-found':'Foydalanuvchi topilmadi','auth/wrong-password':"Parol noto'g'ri",'auth/email-already-in-use':"Bu email allaqachon ro'yxatdan o'tgan",'auth/weak-password':'Parol kamida 6 ta belgi','auth/invalid-email':"Email noto'g'ri",'auth/invalid-credential':"Email yoki parol noto'g'ri"};
-    showAuthError(msgs[e.code]||e.message);
+  }catch(e){
+    const m={'auth/user-not-found':'Foydalanuvchi topilmadi','auth/wrong-password':"Parol noto'g'ri",'auth/email-already-in-use':"Bu email band",'auth/weak-password':'Parol kamida 6 ta belgi','auth/invalid-credential':"Email yoki parol noto'g'ri"};
+    showAuthErr(m[e.code]||e.message);
   }
   btn.disabled=false; btn.textContent=authMode==='login'?'Kirish':"Ro'yxatdan o'tish";
 };
 
 window.forgotPass = async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  if (!email) { showAuthError('Emailni kiriting!'); return; }
-  try { await sendPasswordResetEmail(auth,email); showAuthError('✅ Parol tiklash xati yuborildi!',true); }
-  catch(e) { showAuthError('Xato: '+e.message); }
+  const email=document.getElementById('auth-email').value.trim();
+  if(!email){showAuthErr('Emailni kiriting!');return;}
+  try{await sendPasswordResetEmail(auth,email); showAuthErr('Parol tiklash xati yuborildi!',true);}
+  catch(e){showAuthErr('Xato: '+e.message);}
 };
 
-window.doLogout = () => signOut(auth);
+window.doLogout = ()=>signOut(auth);
 
-function showAuthError(msg,ok=false) {
+function showAuthErr(msg,ok=false){
   const el=document.getElementById('auth-error');
-  el.textContent=msg; el.className='auth-error'+(msg?' show':'');
-  el.style.cssText=ok?'background:#f0fff4;color:#34c759;display:block':'';
+  el.textContent=msg;
+  el.className='auth-error'+(msg?(ok?' ok':' show'):'');
 }
 
-function fmt(n) { return Math.round(Number(n)||0).toLocaleString('uz-UZ')+" so'm"; }
-function setStatus(msg,type='') { const b=document.getElementById('status-box'); b.textContent=msg; b.className='status-box'+(type?' '+type:''); }
+function fmt(n){return Math.round(Number(n)||0).toLocaleString('uz-UZ')+" so'm";}
+function setStatus(msg,type=''){const b=document.getElementById('status-box');b.textContent=msg;b.className='status-box'+(type?' '+type:'');}
 
 window.setTab = t => {
   tab=t;
@@ -252,30 +291,30 @@ window.setTab = t => {
   renderList();
 };
 
-async function loadData() {
-  if (!currentUser) return;
-  document.getElementById('item-list').innerHTML='<div class="loading">⏳ Yuklanmoqda...</div>';
-  try {
+async function loadData(){
+  if(!currentUser)return;
+  document.getElementById('item-list').innerHTML='<div class="loading">Yuklanmoqda...</div>';
+  try{
     const q=query(collection(db,'transactions'),where('uid','==',currentUser.uid),orderBy('createdAt','desc'));
     const snap=await getDocs(q);
     allData=snap.docs.map(d=>({id:d.id,...d.data()}));
     updateSummary(); renderList();
-  } catch(e) {
-    document.getElementById('item-list').innerHTML='<div class="empty">❌ '+e.message+'</div>';
+  }catch(e){
+    document.getElementById('item-list').innerHTML='<div class="empty">Xato: '+e.message+'</div>';
   }
 }
 
-function updateSummary() {
+function updateSummary(){
   ['income','expense','debt','saving'].forEach(k=>{
     const total=allData.filter(x=>x.type===k).reduce((s,x)=>s+(Number(x.amount)||0),0);
     document.getElementById('s-'+k).textContent=fmt(total);
   });
 }
 
-function renderList() {
+function renderList(){
   const items=allData.filter(x=>x.type===tab);
   const list=document.getElementById('item-list');
-  if (!items.length){list.innerHTML='<div class="empty">Hozircha yozuv yo\'q</div>';return;}
+  if(!items.length){list.innerHTML='<div class="empty">Hozircha yozuv yo\'q</div>';return;}
   list.innerHTML=items.map(x=>`
     <div class="item">
       <div class="item-left">
@@ -284,7 +323,7 @@ function renderList() {
       </div>
       <div class="item-right">
         <span class="item-amount" style="color:${COLORS[tab]}">${fmt(x.amount)}</span>
-        <button class="del-btn" onclick="delItem('${x.id}')">🗑</button>
+        <button class="del-btn" onclick="delItem('${x.id}')">&#x1F5D1;</button>
       </div>
     </div>`).join('');
 }
@@ -293,11 +332,11 @@ window.addItem = async () => {
   const name=document.getElementById('inp-name').value.trim();
   const amount=parseFloat(document.getElementById('inp-amount').value);
   const cat=document.getElementById('inp-cat').value||'Boshqa';
-  if (!name||!amount||amount<=0){setStatus('Nom va summani kiriting.','error');return;}
+  if(!name||!amount||amount<=0){setStatus('Nom va summani kiriting.','error');return;}
   const btn=document.getElementById('add-btn');
-  btn.disabled=true; btn.textContent='⏳ Saqlanmoqda...';
+  btn.disabled=true; btn.textContent='Saqlanmoqda...';
   setStatus('Saqlanmoqda...','info');
-  try {
+  try{
     const ref=await addDoc(collection(db,'transactions'),{
       uid:currentUser.uid,type:tab,name,cat,amount,
       date:new Date().toLocaleDateString('uz-UZ'),createdAt:Date.now()
@@ -306,32 +345,99 @@ window.addItem = async () => {
     document.getElementById('inp-name').value='';
     document.getElementById('inp-amount').value='';
     document.getElementById('preview-img').style.display='none';
-    setStatus('✅ Saqlandi!','success');
+    setStatus('Saqlandi!','success');
     updateSummary(); renderList();
     setTimeout(()=>setStatus(''),2000);
-  } catch(e){setStatus('❌ '+e.message,'error');}
-  btn.disabled=false; btn.textContent="➕ Qo'shish";
+  }catch(e){setStatus('Xato: '+e.message,'error');}
+  btn.disabled=false; btn.textContent='+ Qo\'shish';
 };
 
 window.delItem = async id => {
-  if (!confirm("O'chirilsinmi?")) return;
-  try { await deleteDoc(doc(db,'transactions',id)); allData=allData.filter(x=>x.id!==id); updateSummary(); renderList(); }
+  if(!confirm("O'chirilsinmi?"))return;
+  try{await deleteDoc(doc(db,'transactions',id));allData=allData.filter(x=>x.id!==id);updateSummary();renderList();}
   catch(e){alert('Xato: '+e.message);}
 };
 
+// REPORT
+window.openReport = () => {
+  document.getElementById('report-modal').classList.add('show');
+  const income=allData.filter(x=>x.type==='income').reduce((s,x)=>s+Number(x.amount),0);
+  const expense=allData.filter(x=>x.type==='expense').reduce((s,x)=>s+Number(x.amount),0);
+  const balance=income-expense;
+  const el=document.getElementById('r-balance');
+  el.textContent=fmt(Math.abs(balance));
+  el.style.color=balance>=0?'#fff':'#ffcc00';
+  showChart('expense');
+};
+
+window.closeReport = () => document.getElementById('report-modal').classList.remove('show');
+window.closeReportOutside = e => { if(e.target===document.getElementById('report-modal')) closeReport(); };
+
+window.showChart = type => {
+  currentChartType=type;
+  document.querySelectorAll('.rtab').forEach((el,i)=>el.classList.toggle('active',['expense','income','debt','saving'][i]===type));
+  const items=allData.filter(x=>x.type===type);
+  const cats={};
+  items.forEach(x=>{cats[x.cat||'Boshqa']=(cats[x.cat||'Boshqa']||0)+Number(x.amount);});
+  const labels=Object.keys(cats);
+  const values=Object.values(cats);
+  const total=values.reduce((a,b)=>a+b,0);
+  const canvas=document.getElementById('donut');
+  const ctx=canvas.getContext('2d');
+  canvas.width=200; canvas.height=200;
+  ctx.clearRect(0,0,200,200);
+  if(!total){
+    ctx.fillStyle='#e5e5ea';
+    ctx.beginPath();ctx.arc(100,100,80,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#aaa';ctx.font='14px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Ma\'lumot yo\'q',100,105);
+    document.getElementById('chart-legend').innerHTML='';
+    return;
+  }
+  let start=0;
+  values.forEach((v,i)=>{
+    const slice=(v/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.moveTo(100,100);
+    ctx.arc(100,100,90,start,start+slice);
+    ctx.closePath();
+    ctx.fillStyle=PIE_COLORS[i%PIE_COLORS.length];
+    ctx.fill();
+    start+=slice;
+  });
+  // center hole
+  ctx.beginPath();ctx.arc(100,100,55,0,Math.PI*2);
+  ctx.fillStyle='#fff';ctx.fill();
+  // center text
+  ctx.fillStyle='#1d1d1f';ctx.font='bold 13px sans-serif';ctx.textAlign='center';
+  ctx.fillText(fmt(total),100,97);
+  ctx.font='11px sans-serif';ctx.fillStyle='#888';
+  ctx.fillText(LABELS[type],100,113);
+  // legend
+  document.getElementById('chart-legend').innerHTML=labels.map((l,i)=>`
+    <div class="legend-item">
+      <div style="display:flex;align-items:center;flex:1">
+        <div class="legend-dot" style="background:${PIE_COLORS[i%PIE_COLORS.length]}"></div>
+        <span class="legend-label">${l}</span>
+      </div>
+      <span class="legend-val">${fmt(values[i])}</span>
+    </div>`).join('');
+};
+
+// VOICE
 window.toggleVoice = () => {
-  if (isRecording){stopVoice();return;}
+  if(isRecording){stopVoice();return;}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if (!SR){setStatus("Ovoz kiritish qo'llab-quvvatlanmaydi.",'error');return;}
-  recognition=new SR(); recognition.lang='uz-UZ'; recognition.interimResults=false;
-  recognition.onstart=()=>{isRecording=true;const b=document.getElementById('mic-btn');b.className='btn recording';b.textContent="⏹ To'xtatish";setStatus("Gapiring...",'info');};
-  recognition.onresult=e=>{const t=e.results[0][0].transcript;setStatus('"'+t+'" — tahlil...','info');analyzeVoice(t);};
+  if(!SR){setStatus("Ovoz kiritish qo'llab-quvvatlanmaydi.",'error');return;}
+  recognition=new SR();recognition.lang='uz-UZ';recognition.interimResults=false;
+  recognition.onstart=()=>{isRecording=true;const b=document.getElementById('mic-btn');b.className='btn recording';b.textContent="Tinglayapman...";setStatus("Gapiring...",'info');};
+  recognition.onresult=e=>{const t=e.results[0][0].transcript;setStatus('"'+t+'" tahlil qilinmoqda...','info');analyzeVoice(t);};
   recognition.onerror=e=>{setStatus('Xato: '+e.error,'error');stopVoice();};
   recognition.onend=stopVoice;
   recognition.start();
 };
 
-function stopVoice(){isRecording=false;if(recognition)recognition.stop();const b=document.getElementById('mic-btn');b.className='btn';b.textContent='🎤 Ovoz';}
+function stopVoice(){isRecording=false;if(recognition)recognition.stop();const b=document.getElementById('mic-btn');b.className='btn';b.textContent='&#x1F3A4; Ovoz';}
 
 async function analyzeVoice(text){
   try{
@@ -342,7 +448,7 @@ async function analyzeVoice(text){
     if(p.amount>0)document.getElementById('inp-amount').value=p.amount;
     if(p.cat){const s=document.getElementById('inp-cat');for(let o of s.options)if(o.value===p.cat){s.value=p.cat;break;}}
     setStatus("Tayyor! 'Qo'shish' ni bosing.",'success');
-  }catch(e){setStatus("Tahlil xatosi.",'error');}
+  }catch(e){setStatus("Tahlil xatosi. Qo'lda to'ldiring.",'error');}
 }
 
 window.handleImage = e => {
